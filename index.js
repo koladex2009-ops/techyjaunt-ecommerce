@@ -13,6 +13,7 @@ const PORT = process.env.PORT;
 
 
 app.use(express.json());
+app.use(morgan('dev'));
 
 connectDB();
 
