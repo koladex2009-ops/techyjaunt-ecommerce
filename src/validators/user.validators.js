@@ -27,10 +27,29 @@ const resetPasswordSchema = Joi.object({
   newPassword: Joi.string().min(8).max(64).required(),
 });
 
+const updateProfileSchema = Joi.object({
+  firstname: Joi.string().trim().min(2).max(50),
+  lastname: Joi.string().trim().min(2).max(50),
+}).or('firstname', 'lastname');
+
+const changePasswordSchema = Joi.object({
+  currentPassword: Joi.string().required(),
+  newPassword: Joi.string()
+    .min(8)
+    .max(64)
+    .invalid(Joi.ref('currentPassword'))
+    .required()
+    .messages({
+      'any.invalid': '"newPassword" must be different from the current password',
+    }),
+});
+
 module.exports = {
   signUpSchema,
   loginSchema,
   verifyOtpSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  updateProfileSchema,
+  changePasswordSchema,
 };
