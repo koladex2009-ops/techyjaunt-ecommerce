@@ -206,6 +206,44 @@ const getProfile = async (req, res) => {
   }
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const { firstname, lastname } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { firstname, lastname },
+      { new: true, runValidators: true }
+    ).select('-password -otp -otpExpiresAt');
+
+    return res.status(200).json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user._id);
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   signUp,
   login,
@@ -215,4 +253,6 @@ module.exports = {
   forgotPassword,
   resetPassword,
   getProfile,
+  updateProfile,
+  changePassword,
 };
