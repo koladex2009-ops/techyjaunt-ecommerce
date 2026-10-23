@@ -2,6 +2,7 @@ const User = require('../models/user.models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../helpers/email');
+const renderTemplate = require('../helpers/renderTemplate');
 require("dotenv").config()
 
 const signUp = async (req, res) => {
@@ -78,7 +79,13 @@ const sendOtp = async (req, res) => {
     user.otpExpiresAt = otpExpiresAt;
     await user.save();
 
-    await sendEmail(user.email, "OTP for verification", `Your OTP is ${otp}`);
+    const html = await renderTemplate('otp', {
+  name: user.firstname,
+  message: 'Use the code below to verify your email address.',
+  otp,
+  expiresInMinutes: 10,
+});
+await sendEmail(user.email, "OTP for verification", `Your OTP is ${otp}`, html);
     return res.status(200).json({message: "OTP sent successfully"});
   } catch (error) {
     console.log(error);
@@ -130,7 +137,13 @@ const resendOtp = async (req, res) => {
     user.otpExpiresAt = otpExpiresAt;
     await user.save();
 
-    await sendEmail(user.email, "Your OTP", `Your OTP is ${otp}`);
+    const html = await renderTemplate('otp', {
+  name: user.firstname,
+  message: 'Here is your new verification code.',
+  otp,
+  expiresInMinutes: 10,
+});
+await sendEmail(user.email, "Your OTP", `Your OTP is ${otp}`, html);
 
     return res.status(200).json({message: "OTP sent successfully", otp: otp, otpExpiresAt: otpExpiresAt, });
   } catch (error) {
@@ -155,7 +168,13 @@ const forgotPassword = async (req, res) => {
     user.otpExpiresAt = otpExpiresAt;
     await user.save();
 
-await sendEmail(user.email, "Password reset OTP", `Your password reset OTP is ${otp}`);
+const html = await renderTemplate('otp', {
+  name: user.firstname,
+  message: 'Use the code below to reset your password.',
+  otp,
+  expiresInMinutes: 10,
+});
+await sendEmail(user.email, "Password reset OTP", `Your password reset OTP is ${otp}`, html);
 
     return res.status(200).json({message: "OTP sent successfully", otp: otp, otpExpiresAt: otpExpiresAt, });
   } catch (error) {
