@@ -145,7 +145,7 @@ const resendOtp = async (req, res) => {
 });
 await sendEmail(user.email, "Your OTP", `Your OTP is ${otp}`, html);
 
-    return res.status(200).json({message: "OTP sent successfully", otp: otp, otpExpiresAt: otpExpiresAt, });
+    return res.status(200).json({message: "OTP sent successfully" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -176,7 +176,7 @@ const html = await renderTemplate('otp', {
 });
 await sendEmail(user.email, "Password reset OTP", `Your password reset OTP is ${otp}`, html);
 
-    return res.status(200).json({message: "OTP sent successfully", otp: otp, otpExpiresAt: otpExpiresAt, });
+    return res.status(200).json({message: "OTP sent successfully" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
